@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:27:59 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/26 21:30:14 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/27 23:42:24 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	handle_promt(char *promt)
 	{
 		add_history(term_line);
 		argv = ft_split(term_line, ' ');
-		handle_command(argv, args_count(argv));
+		handle_command(argv, args_count(argv, 0));
 		clean_args(argv);
 	}
 	free(term_line);

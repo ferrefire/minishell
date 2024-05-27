@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 19:24:18 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/26 21:59:46 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/28 00:14:48 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,10 @@
 
 int exec_file(char **command)
 {
-	struct stat st;
-	int			ppid;
-
-	if (stat(command[0], &st) == 0 && st.st_mode & S_IXUSR)
+	if (access(command[0], X_OK) == 0)
 	{
-		ppid = getpid();
-		fork();
-		if (getpid() != ppid && execve(command[0], command, NULL) == -1)
+		if (execve(command[0], copy_args(command, 0, 1), NULL) == -1)
 			printf("Error when executing\n");
-		wait(NULL);
 	}
 	else
 	{
@@ -33,7 +27,7 @@ int exec_file(char **command)
 	return (1);
 }
 
-int print_working_dir()
+int print_working_dir(void)
 {
 	char	*cdir;
 
@@ -43,44 +37,56 @@ int print_working_dir()
 	return (1);
 }
 
+int	echo(char **command)
+{
+	int		start;
+	int		amount;
+	char	*standard;
+	int		i;
+
+	start = 1;
+	amount = 0;
+	standard = "\n";
+	if (command[start] && ft_strncmp(command[start], "-n", 0) == 0 && ++start)
+		standard = "";
+	while (command[start + amount])
+	{
+		if (is_metachar(command[start + amount]))
+			break ;
+		amount++;
+	}
+	i = -1;
+	while (++i < amount)
+	{
+		if (i > 0)
+			printf(" ");
+		printf("%s", command[start + i]);
+	}
+	printf("%s", standard);
+	return (1);
+}
+
 int handle_command(char **command, int count)
 {
-	int	p[2];
-	char *output;
-	char *temp;
+	int p;
 
-	if (count == 2 && ft_strncmp(command[1], "|", ft_strlen(command[1])) == 0)
-	{
-		pipe(p);
-		p[1] = dup(1);
-	}
+	if (count == 0)
+		return (1);
 
-	if (ft_strncmp(command[0], "cd", ft_strlen(command[0])) == 0)
+	if (ft_strncmp(command[0], "cd", 0) == 0)
 		chdir(command[1]);
-	else if (ft_strncmp(command[0], "echo", ft_strlen(command[0])) == 0 && ft_strncmp(command[1], "-n", ft_strlen(command[1])) == 0)
-		printf("%s", command[2]);
-	else if (ft_strncmp(command[0], "echo", ft_strlen(command[0])) == 0)
-		printf("%s\n", command[1]);
-	else if (ft_strncmp(command[0], "pwd", ft_strlen(command[0])) == 0)
-		print_working_dir();
-	else if (ft_strncmp(command[0], "exit", ft_strlen(command[0])) == 0)
+	else if (ft_strncmp(command[0], "exit", 0) == 0)
 		exit(EXIT_SUCCESS);
-	else
-		exec_file(command);
-
-	if (count == 2 && ft_strncmp(command[1], "|", ft_strlen(command[1])) == 0)
+	p = direct(command);
+	if (p > -1)
 	{
-		temp = get_next_line(p[0]);
-		while (temp)
-		{
-			output = str_join_free(output, temp);
-			temp = get_next_line(p[0]);
-		}
-		close(p[1]);
-		//close(p[0]);
-		printf("Gathered output: %s", output);
-		free(output);
+		if (ft_strncmp(command[0], "echo", 0) == 0)
+			echo(command);
+		else if (ft_strncmp(command[0], "pwd", 0) == 0)
+			print_working_dir();
+		else if (!is_metachar(command[p]))
+			exec_file(command + p);
+		exit(EXIT_SUCCESS);
 	}
-
 	return (1);
 }
