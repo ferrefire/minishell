@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:27:59 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 04:28:50 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/28 04:30:09 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	set_non_canonical(void)
 	tcgetattr(1, &term);
 	term.c_lflag &= ~ICANON;
 	tcsetattr(1, TCSANOW, &term);
-	return (0);
 }
 
 int	handle_promt(char *promt)
