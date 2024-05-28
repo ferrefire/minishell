@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 19:24:18 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 00:14:48 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/28 02:40:20 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int exec_file(char **command)
 {
+	char	*file_path;
+
 	if (access(command[0], X_OK) == 0)
 	{
 		if (execve(command[0], copy_args(command, 0, 1), NULL) == -1)
@@ -21,8 +23,17 @@ int exec_file(char **command)
 	}
 	else
 	{
-		printf("file is not a valid executable: %s\n", command[0]);
-		return (0);
+		file_path = find_file(command[0]);
+		if (file_path && access(file_path, X_OK) == 0)
+		{
+			if (execve(file_path, copy_args(command, 0, 1), NULL) == -1)
+				printf("Error when executing\n");
+		}
+		else
+		{
+			printf("file is not a valid executable: %s\n", command[0]);
+			return (0);
+		}
 	}
 	return (1);
 }
