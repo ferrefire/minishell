@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:28:11 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 04:15:41 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/28 06:57:51 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char *str_join_free(char *s1, char *s2);
 char **clean_args(char **arr);
 int args_count(char **args, int meta_break);
 char **copy_args(char **args, int amount, int meta_break);
-int direct(char **command);
+int direct(char **command, char **piped_args);
 int is_metachar(char *command);
 int print_dir(char *path);
 char *search_dir(char *file_name, char *dir_path);

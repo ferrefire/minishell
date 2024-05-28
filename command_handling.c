@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 19:24:18 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 02:40:20 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/28 07:18:31 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,25 +79,37 @@ int	echo(char **command)
 
 int handle_command(char **command, int count)
 {
+	char	*piped_args;
 	int p;
 
 	if (count == 0)
 		return (1);
-
+	piped_args = NULL;
 	if (ft_strncmp(command[0], "cd", 0) == 0)
 		chdir(command[1]);
 	else if (ft_strncmp(command[0], "exit", 0) == 0)
 		exit(EXIT_SUCCESS);
-	p = direct(command);
+	p = direct(command, &piped_args);
 	if (p > -1)
 	{
 		if (ft_strncmp(command[0], "echo", 0) == 0)
 			echo(command);
 		else if (ft_strncmp(command[0], "pwd", 0) == 0)
 			print_working_dir();
-		else if (!is_metachar(command[p]))
-			exec_file(command + p);
+		else if (!is_metachar(command[0]))
+			exec_file(command);
 		exit(EXIT_SUCCESS);
+	}
+	if (piped_args)
+	{
+		//printf("piped args: %s\n", piped_args);
+		char **new_command = malloc(sizeof(void *) * 3);
+		new_command[0] = ft_strdup(command[args_count(command, 1) + 1]);
+		new_command[1] = ft_strdup(piped_args);
+		new_command[2] = NULL;
+		free(piped_args);
+		handle_command(new_command, 1);
+		clean_args(new_command);
 	}
 	return (1);
 }
