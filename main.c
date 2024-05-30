@@ -30,12 +30,13 @@ int	handle_promt(char *prompt)
 		return (0);
 	if (ft_strlen(term_line) != 0)
 	{
-		printf("\n");
-		add_history(term_line);
 		argv = ft_split(term_line, ' ');
-		handle_command(argv, args_count(argv, 0));
-		clean_args(argv);
-		printf("\n");
+        if (args_count(argv, 0) > 0)
+        {
+            add_history(term_line);
+            handle_command(argv);
+            clean_args(argv);
+        }
 	}
 	free(term_line);
 	return (1);
@@ -50,7 +51,7 @@ int	main(void)
 	while (1)
 	{
 		cdir = getcwd(NULL, 0);
-		prompt = str_join_free(str_join_free(ft_strdup("-minishell-"), cdir), ft_strdup("$ "));
+		prompt = str_join_free(str_join_free("-minishell-", cdir, 0, 1), "$ ", 1, 0);
 		if (!handle_promt(prompt))
 			break ;
 		free(prompt);

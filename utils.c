@@ -12,37 +12,57 @@
 
 #include "minishell.h"
 
-int is_metachar(char *command)
+int in_str(char *s, char *str)
 {
-	char **commands;
+	char **strs;
 	int i;
 	int found;
 
-	if (!command || ft_strlen(command) == 0)
+	if (!s || ft_strlen(s) == 0)
 		return (-1);
-	commands = ft_split(METACHARS, ' ');
-	found = 0;
+    strs = ft_split(str, ' ');
+    found = 0;
 	i = -1;
-	while (commands[++i])
-	{
-		if (ft_strncmp(commands[i], command, ft_strlen(commands[i])) == 0)
-		{
+    while (strs[++i])
+    {
+        if (ft_strncmp(strs[i], s, ft_strlen(strs[i])) == 0)
+        {
 			found = 1;
 			break;
 		}
 	}
-	clean_args(commands);
-	return (found);
+    clean_args(strs);
+    return (found);
 }
 
-char	*str_join_free(char *s1, char *s2)
+int get_exec(char **commands)
+{
+    char    *exec_path;
+
+    if (access(commands[0], X_OK) == 0)
+        return (1);
+    else
+    {
+        exec_path = find_file(commands[0]);
+        if (exec_path)
+        {
+            free(commands[0]);
+            commands[0] = exec_path;
+            if (access(commands[0], X_OK) == 0)
+                return (1);
+        }
+    }
+    return (0);
+}
+
+char	*str_join_free(char *s1, char *s2, int f1, int f2)
 {
 	char	*str;
 
 	str = ft_strjoin(s1, s2);
-	if (s1)
+	if (s1 && f1)
 		free(s1);
-	if (s2)
+	if (s2 && f2)
 		free(s2);
 	return (str);
 }
@@ -66,9 +86,9 @@ int	args_count(char **args, int meta_break)
 	int	i;
 
 	i = 0;
-	while (args[i])
+	while (args && args[i])
 	{
-		if (meta_break && is_metachar(args[i]) == 1)
+		if (meta_break && in_str(args[i], METACHARS) == 1)
 			break ;
 		++i;
 	}
@@ -80,7 +100,7 @@ char	**copy_args(char **args, int amount, int meta_break)
 	char	**new_args;
 	int	i;
 
-	if (meta_break || args_count(args, 0) < amount)
+	if (meta_break || args_count(args, 0) < amount || amount == -1)
 		amount = args_count(args, meta_break);
 	new_args = malloc(sizeof(void *) * (amount + 1));
 	i = -1;

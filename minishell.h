@@ -32,18 +32,22 @@
 #define RE_IN_DEL "<<"
 #define PIPE "|"
 #define METACHARS "> >> < << |"
+#define BUILT_IN_CMD "cd pwd echo exit export unset env $?"
+#define PARENT 1
+#define CHILD 2
 
 void interrupt_shell(int signal);
 int exec_file(char **command);
-int handle_command(char **command, int count);
-char *str_join_free(char *s1, char *s2);
+int handle_command(char **command);
+char *str_join_free(char *s1, char *s2, int f1, int f2);
 char **clean_args(char **arr);
 int args_count(char **args, int meta_break);
 char **copy_args(char **args, int amount, int meta_break);
-int direct(char **command, char **piped_args);
-int is_metachar(char *command);
+int direct(char **command);
+int in_str(char *s, char *str);
 int print_dir(char *path);
 char *search_dir(char *file_name, char *dir_path);
 char *find_file(char *file_name);
+int get_exec(char **commands);
 
 #endif

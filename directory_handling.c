@@ -53,7 +53,7 @@ char	*search_dir(char *file_name, char *dir_path)
 		if (current_file && ft_strncmp(current_file, file_name, 0) == 0)
 		{
 			file_path = ft_strjoin(dir_path, "/");
-			file_path = str_join_free(file_path, ft_strdup(file_name));
+			file_path = str_join_free(file_path, file_name, 1, 0);
 			break ;
 		}
 		if (dir)
@@ -68,10 +68,13 @@ char	*find_file(char *file_name)
 {
 	char	**env_paths;
 	char	*file_path;
+    //char    *cdir;
 	int		i;
 
-	env_paths = ft_split(getenv("PATH"), ':');
-	file_path = NULL;
+    //cdir = str_join_free(getcwd(NULL, 0), ":", 1, 0);
+    //env_paths = ft_split(str_join_free(cdir, getenv("PATH"), 1, 0), ':');
+    env_paths = ft_split(getenv("PATH"), ':');
+    file_path = NULL;
 	i = -1;
 	while (env_paths[++i])
 	{

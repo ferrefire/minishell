@@ -12,33 +12,56 @@
 
 #include "minishell.h"
 
-int	pipe_output(char **result)
+int pipe_output()
 {
-	int pid;
-	int p[2];
-	pipe(p);
-	int saved_out = dup(1);
-	dup2(p[1], 1);
-	pid = fork();
-	if (pid == 0)
-		return (0);
-	waitpid(pid, NULL, 0);
-	close(p[1]);
-	dup2(saved_out, 1);
-	close(saved_out);
-	//char *result = NULL;
-	char *temp;
-	temp = get_next_line(p[0]);
-	while (temp)
-	{
-		if (!*result) *result = ft_strdup(temp);
-		else *result = str_join_free(*result, temp);
-		//free(temp);
-		temp = get_next_line(p[0]);
-	}
-	close(p[0]);
-	return (-1);
+    int pid = fork();
+    if (pid == 0)
+    {
+        int p[2];
+        pipe(p);
+        int pid2 = fork();
+        if (pid2 == 0)
+        {
+            dup2(p[1], STDOUT_FILENO);
+            return (1);
+        }
+        else
+        {
+            waitpid(pid2, NULL, 0);
+            close(p[1]);
+            dup2(p[0], STDIN_FILENO);
+            return (2);
+        }
+    }
+    waitpid(pid, NULL, 0);
+    return (0);
 }
+
+//int	pipe_output(char **result)
+//{
+//	int pid;
+//	int p[2];
+//	pipe(p);
+//	int saved_out = dup(1);
+//	dup2(p[1], 1);
+//	pid = fork();
+//	if (pid == 0)
+//		return (1);
+//	waitpid(pid, NULL, 0);
+//	close(p[1]);
+//	dup2(saved_out, 1);
+//	close(saved_out);
+//	char *temp;
+//	temp = get_next_line(p[0]);
+//	while (temp)
+//	{
+//		if (!*result) *result = ft_strdup(temp);
+//		else *result = str_join_free(*result, temp, 1, 1);
+//		temp = get_next_line(p[0]);
+//	}
+//	close(p[0]);
+//	return (0);
+//}
 
 int	redirect_output(int fd)
 {
@@ -49,15 +72,15 @@ int	redirect_output(int fd)
 	dup2(fd, 1);
 	pid = fork();
 	if (pid == 0)
-		return (0);
+		return (1);
 	waitpid(pid, NULL, 0);
 	close(fd);
 	dup2(saved_out, 1);
 	close(saved_out);
-	return (-1);
+	return (0);
 }
 
-int direct(char **command, char **piped_args)
+int direct(char **command)
 {
 	int i;
 	int pid;
@@ -70,11 +93,11 @@ int direct(char **command, char **piped_args)
 		else if (ft_strncmp(command[i], RE_OUT_APP, 0) == 0)
 			return (redirect_output(open(command[i + 1], O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR)));
 		else if (ft_strncmp(command[i], PIPE, 0) == 0)
-			return (pipe_output(piped_args));
+			return (pipe_output());
 	}
 	pid = fork();
 	if (pid == 0)
-		return (0);
+		return (1);
 	waitpid(pid, NULL, 0);
-	return (-1);
+	return (0);
 }
