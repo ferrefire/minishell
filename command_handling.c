@@ -3,33 +3,39 @@
 /*                                                        ::::::::            */
 /*   command_handling.c                                 :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: ferre <ferre@student.codam.nl>               +#+                     */
+/*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 19:24:18 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 07:18:31 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/31 15:04:20 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int exec_file(char **command)
+int exec_file(t_data *data)
 {
-    if (execve(command[0], command, NULL) == -1)
-    {
-        printf("Error when executing\n");
-        return (0);
-    }
-    return (1);
+    if (execve(data->commands[0], data->commands, NULL) == -1)
+        quit_shell(0, "error when executing file", data);
+    return (quit_shell(EXIT_SUCCESS, NULL, data));
 }
 
-int print_working_dir(void)
-{
-	char	*cdir;
+//int print_working_dir(t_data *data)
+//{
+//	printf("%s\n", data->cdir);
+//	return (1);
+//}
 
-	cdir = getcwd(NULL, 0);
-	printf("%s\n", cdir);
-	free(cdir);
-	return (1);
+int print_env(t_data *data)
+{
+    int i;
+
+    i = 0;
+    while (data->envp[i])
+    {
+        printf("%s\n", data->envp[i]);
+        i++;
+    }
+    return (1);
 }
 
 int	echo(char **command)
@@ -57,45 +63,41 @@ int	echo(char **command)
 	return (1);
 }
 
-int built_in(char **command)
+int built_in(t_data *data)
 {
-    if (ft_strncmp(command[0], "cd", 0) == 0)
-        chdir(command[1]);
-    else if (ft_strncmp(command[0], "echo", 0) == 0)
-        echo(command);
-    else if (ft_strncmp(command[0], "pwd", 0) == 0)
-        print_working_dir();
-    exit(EXIT_SUCCESS);
+    if (ft_strncmp(data->commands[0], "echo", 0) == 0)
+        echo(data->commands);
+    else if (ft_strncmp(data->commands[0], "pwd", 0) == 0)
+        printf("%s\n", data->cdir);
+    else if (ft_strncmp(data->commands[0], "env", 0) == 0)
+        print_env(data);
+    return (quit_shell(EXIT_SUCCESS, NULL, data));
 }
 
-int handle_command(char **command)
+int handle_command(t_data *data)
 {
-    char    **cmd_args;
 	int     p;
 
-    if (ft_strncmp(command[0], "exit", 0) == 0)
+    if (ft_strncmp(data->commands[0], "exit", 0) == 0)
         exit(EXIT_SUCCESS);
-    else if (ft_strncmp(command[0], "cd", 0) == 0)
-        return (chdir(command[1]) + 1);
-    p = direct(command);
+    else if (ft_strncmp(data->commands[0], "cd", 0) == 0)
+        return (chdir(data->commands[1]) + 1);
+    p = direct(data->commands);
 	if (p != 0)
     {
         if (p == 1)
-            cmd_args = copy_args(command, 0, 1);
-        else if (p == 2)
+            clip_commands(data);
+        if (p == 2)
         {
-            cmd_args = copy_args(command + args_count(command, 1) + 1, -1, 0);
-            handle_command(cmd_args);
-            clean_args(cmd_args);
-            exit(EXIT_SUCCESS);
+            iterate_commands(data);
+            handle_command(data);
+            return quit_shell(EXIT_SUCCESS, NULL, data);
         }
-        if (in_str(cmd_args[0], BUILT_IN_CMD) == 1)
-            built_in(cmd_args);
-        else if (get_exec(cmd_args))
-            exec_file(cmd_args);
-        if (cmd_args)
-            clean_args(cmd_args);
-        exit(EXIT_SUCCESS);
+        if (in_str(data->commands[0], BUILT_IN_CMD) == 1)
+            built_in(data);
+        else if (get_exec(data))
+            exec_file(data);
+        return quit_shell(EXIT_SUCCESS, NULL, data);
     }
 	return (1);
 }

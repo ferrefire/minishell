@@ -3,10 +3,10 @@
 /*                                                        ::::::::            */
 /*   utils.c                                            :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: ferre <ferre@student.codam.nl>               +#+                     */
+/*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 16:36:46 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/27 23:41:37 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/31 14:59:07 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,20 +35,20 @@ int in_str(char *s, char *str)
     return (found);
 }
 
-int get_exec(char **commands)
+int get_exec(t_data *data)
 {
     char    *exec_path;
 
-    if (access(commands[0], X_OK) == 0)
+    if (access(data->commands[0], X_OK) == 0)
         return (1);
     else
     {
-        exec_path = find_file(commands[0]);
+        exec_path = find_file(data->commands[0]);
         if (exec_path)
         {
-            free(commands[0]);
-            commands[0] = exec_path;
-            if (access(commands[0], X_OK) == 0)
+            free(data->commands[0]);
+            data->commands[0] = exec_path;
+            if (access(data->commands[0], X_OK) == 0)
                 return (1);
         }
     }
@@ -71,7 +71,9 @@ char	**clean_args(char **arr)
 {
 	int	i;
 
-	i = 0;
+    if (!arr)
+        return (NULL);
+    i = 0;
 	while (arr[i])
 	{
 		free(arr[i]);

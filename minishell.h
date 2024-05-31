@@ -3,10 +3,10 @@
 /*                                                        ::::::::            */
 /*   minishell.h                                        :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: ferre <ferre@student.codam.nl>               +#+                     */
+/*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:28:11 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 06:57:51 by ferre         ########   odam.nl         */
+/*   Updated: 2024/05/31 14:48:35 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,17 @@
 #define PARENT 1
 #define CHILD 2
 
+typedef struct data
+{
+    char **envp;
+    char *command_line;
+    char **commands;
+    char *cdir;
+}               t_data;
+
 void interrupt_shell(int signal);
-int exec_file(char **command);
-int handle_command(char **command);
+int exec_file(t_data *data);
+int handle_command(t_data *data);
 char *str_join_free(char *s1, char *s2, int f1, int f2);
 char **clean_args(char **arr);
 int args_count(char **args, int meta_break);
@@ -48,6 +56,10 @@ int in_str(char *s, char *str);
 int print_dir(char *path);
 char *search_dir(char *file_name, char *dir_path);
 char *find_file(char *file_name);
-int get_exec(char **commands);
+int get_exec(t_data *data);
+int clean_shell(t_data *data);
+int quit_shell(int exit_code, char *error, t_data *data);
+int iterate_commands(t_data *data);
+int clip_commands(t_data *data);
 
 #endif

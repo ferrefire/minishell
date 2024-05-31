@@ -1,7 +1,7 @@
 CC=cc
 CFLAGS=-Wall -Wextra -Werror
 LFLAGS=-Llibft -lft -lreadline
-SRC=main.c signal_handling.c command_handling.c utils.c redirecting.c directory_handling.c
+SRC=main.c signal_handling.c command_handling.c utils.c redirecting.c directory_handling.c shell_handling.c
 OBJ=$(SRC:%.c=%.o)
 NAME=minishell
 
