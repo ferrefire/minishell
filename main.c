@@ -6,7 +6,7 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:27:59 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/31 15:00:20 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/03 21:56:37 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ int	handle_promt(char *prompt, t_data *data)
         return (0);
     if (ft_strlen(data->command_line) != 0)
     {
-        data->commands = ft_split(data->command_line, ' ');
+        //data->commands = ft_split(data->command_line, ' ');
+        check_commands(data);
         if (args_count(data->commands, 0) > 0)
         {
             add_history(data->command_line);
@@ -52,21 +53,20 @@ int	main(int argc, char **argv, char **envp)
     data = malloc(sizeof(t_data));
     if (!data)
         exit(EXIT_FAILURE);
-    data->envp = envp;
+    data->envp = copy_args(envp, -1, 0);
+    data->commands = NULL;
     signal(SIGINT, interrupt_shell);
 	while (1)
 	{
         if (data->cdir)
             free(data->cdir);
         data->cdir = getcwd(NULL, 0);
-        prompt = str_join_free(ft_strjoin("-minishell-", data->cdir), "$ ", 1, 0);
+        prompt = str_add(ft_strjoin("-minishell-", data->cdir), "$ ", 1, 0);
 		if (!handle_promt(prompt, data))
 			break ;
 		free(prompt);
 	}
 	if (prompt)
 		free(prompt);
-    clear_history();
-    clean_shell(data);
-    exit(EXIT_SUCCESS);
+    quit_shell(EXIT_SUCCESS, NULL, data);
 }

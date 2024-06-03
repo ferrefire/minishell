@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/27 21:25:11 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 07:04:16 by ferre         ########   odam.nl         */
+/*   Updated: 2024/06/03 14:59:49 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,22 +63,78 @@ int pipe_output()
 //	return (0);
 //}
 
-int	redirect_output(int fd)
+int redirect_stream(int fd, int redirect_fd)
 {
-	int	saved_out;
-	int	pid;
+    int saved_out;
+    int pid;
 
-	saved_out = dup(1);
-	dup2(fd, 1);
-	pid = fork();
-	if (pid == 0)
-		return (1);
-	waitpid(pid, NULL, 0);
-	close(fd);
-	dup2(saved_out, 1);
-	close(saved_out);
-	return (0);
+    if (fd == -1)
+        return (0);
+    saved_out = dup(redirect_fd);
+    dup2(fd, redirect_fd);
+    pid = fork();
+    if (pid == 0)
+        return (1);
+    waitpid(pid, NULL, 0);
+    close(fd);
+    dup2(saved_out, redirect_fd);
+    close(saved_out);
+    return (0);
 }
+
+int read_until_del(char *delimiter)
+{
+    int pid = fork();
+    if (pid == 0)
+    {
+        int p[2];
+        pipe(p);
+        int pid2 = fork();
+        if (pid2 == 0)
+        {
+            dup2(p[1], STDOUT_FILENO);
+            char *temp;
+            temp = get_next_line(STDIN_FILENO);
+            while (temp)
+            {
+                if (ft_strnstr(temp, delimiter, 0) != NULL)
+                    break;
+                printf("%s", temp);
+                free(temp);
+                temp = get_next_line(STDIN_FILENO);
+            }
+            if (temp)
+                free(temp);
+            exit(EXIT_SUCCESS);
+        }
+        else
+        {
+            waitpid(pid2, NULL, 0);
+            close(p[1]);
+            dup2(p[0], STDIN_FILENO);
+            return (1);
+        }
+    }
+    waitpid(pid, NULL, 0);
+    return (0);
+}
+
+//int	redirect_output(int fd)
+//{
+//	int	saved_out;
+//	int	pid;
+//
+//	saved_out = dup(1);
+//	dup2(fd, 1);
+//	pid = fork();
+//	if (pid == 0)
+//		return (1);
+//	waitpid(pid, NULL, 0);
+//	close(fd);
+//	dup2(saved_out, 1);
+//	close(saved_out);
+//	return (0);
+//}
 
 int direct(char **command)
 {
@@ -88,12 +144,16 @@ int direct(char **command)
 	i = -1;
 	while (command[++i] && command[i + 1])
 	{
-		if (ft_strncmp(command[i], RE_OUT, 0) == 0)
-			return (redirect_output(open(command[i + 1], O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR)));
-		else if (ft_strncmp(command[i], RE_OUT_APP, 0) == 0)
-			return (redirect_output(open(command[i + 1], O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR)));
-		else if (ft_strncmp(command[i], PIPE, 0) == 0)
-			return (pipe_output());
+        if (ft_strncmp(command[i], RE_OUT, 0) == 0)
+            return (redirect_stream(open(command[i + 1], O_RDWR | O_CREAT | O_TRUNC, S_IRWXU), STDOUT_FILENO));
+        else if (ft_strncmp(command[i], RE_OUT_APP, 0) == 0)
+            return (redirect_stream(open(command[i + 1], O_RDWR | O_CREAT | O_APPEND, S_IRWXU), STDOUT_FILENO));
+        else if (ft_strncmp(command[i], RE_IN, 0) == 0)
+            return (redirect_stream(open(command[i + 1], O_RDONLY), STDIN_FILENO));
+        else if (ft_strncmp(command[i], RE_IN_DEL, 0) == 0)
+            return (read_until_del(command[i + 1]));
+        else if (ft_strncmp(command[i], PIPE, 0) == 0)
+            return (pipe_output());
 	}
 	pid = fork();
 	if (pid == 0)

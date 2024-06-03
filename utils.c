@@ -6,13 +6,13 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 16:36:46 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/31 14:59:07 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/03 21:16:26 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int in_str(char *s, char *str)
+int in_str(char *s, char *str, int size)
 {
 	char **strs;
 	int i;
@@ -25,7 +25,7 @@ int in_str(char *s, char *str)
 	i = -1;
     while (strs[++i])
     {
-        if (ft_strncmp(strs[i], s, ft_strlen(strs[i])) == 0)
+        if (ft_strncmp(strs[i], s, size) == 0)
         {
 			found = 1;
 			break;
@@ -55,7 +55,7 @@ int get_exec(t_data *data)
     return (0);
 }
 
-char	*str_join_free(char *s1, char *s2, int f1, int f2)
+char	*str_add(char *s1, char *s2, int f1, int f2)
 {
 	char	*str;
 
@@ -90,7 +90,7 @@ int	args_count(char **args, int meta_break)
 	i = 0;
 	while (args && args[i])
 	{
-		if (meta_break && in_str(args[i], METACHARS) == 1)
+		if (meta_break && in_str(args[i], ARG_METACHARS, 0) == 1)
 			break ;
 		++i;
 	}
@@ -110,4 +110,23 @@ char	**copy_args(char **args, int amount, int meta_break)
 		new_args[i] = ft_strdup(args[i]);
 	new_args[i] = NULL;
 	return (new_args);
+}
+
+char    **add_to_args(char *add, char **args)
+{
+    char    **new_args;
+    int     new_count;
+    int     i;
+
+    new_count = args_count(args, 0) + 1;
+        new_args = malloc(sizeof(void *) * (new_count + 1));
+    i = -1;
+    while (++i < (new_count - 1))
+        new_args[i] = ft_strdup(args[i]);
+    new_args[i] = ft_strdup(add);
+    new_args[++i] = NULL;
+    if (args)
+        clean_args(args);
+    //free(add);
+    return (new_args);
 }

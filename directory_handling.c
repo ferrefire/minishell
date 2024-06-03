@@ -6,7 +6,7 @@
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/28 01:46:17 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/28 02:20:24 by ferre         ########   odam.nl         */
+/*   Updated: 2024/06/03 18:40:24 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char	*search_dir(char *file_name, char *dir_path)
 		if (current_file && ft_strncmp(current_file, file_name, 0) == 0)
 		{
 			file_path = ft_strjoin(dir_path, "/");
-			file_path = str_join_free(file_path, file_name, 1, 0);
+			file_path = str_add(file_path, file_name, 1, 0);
 			break ;
 		}
 		if (dir)
