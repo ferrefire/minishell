@@ -6,7 +6,7 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 19:24:18 by ferre         #+#    #+#                 */
-/*   Updated: 2024/06/03 21:56:59 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/06 19:51:30 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,6 @@ int exec_file(t_data *data)
 //	printf("%s\n", data->cdir);
 //	return (1);
 //}
-
-int print_env(t_data *data)
-{
-    int i;
-
-    i = 0;
-    while (data->envp[i])
-    {
-        printf("%s\n", data->envp[i]);
-        i++;
-    }
-    return (1);
-}
 
 int	echo(t_data *data)
 {
@@ -84,6 +71,8 @@ int handle_command(t_data *data)
         return (chdir(data->commands[1]) + 1);
     else if (ft_strncmp(data->commands[0], "export", 0) == 0)
         return (export(data));
+    else if (ft_strncmp(data->commands[0], "unset", 0) == 0)
+        return (unset(data));
     p = direct(data->commands);
 	if (p != 0)
     {

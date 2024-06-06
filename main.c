@@ -6,7 +6,7 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:27:59 by ferre         #+#    #+#                 */
-/*   Updated: 2024/06/03 21:56:37 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/06 19:16:31 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,9 @@ int	handle_promt(char *prompt, t_data *data)
     return (1);
 }
 
-int	main(int argc, char **argv, char **envp)
+t_data  *setup(int argc, char **argv, char **envp)
 {
-    t_data      *data;
-	char		*prompt;
+    t_data  *data;
 
     if (argc != 1)
     {
@@ -55,8 +54,17 @@ int	main(int argc, char **argv, char **envp)
         exit(EXIT_FAILURE);
     data->envp = copy_args(envp, -1, 0);
     data->commands = NULL;
+    return (data);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+    t_data      *data;
+	char		*prompt;
+
+    data = setup(argc, argv, envp);
     signal(SIGINT, interrupt_shell);
-	while (1)
+    while (1)
 	{
         if (data->cdir)
             free(data->cdir);
@@ -64,8 +72,9 @@ int	main(int argc, char **argv, char **envp)
         prompt = str_add(ft_strjoin("-minishell-", data->cdir), "$ ", 1, 0);
 		if (!handle_promt(prompt, data))
 			break ;
-		free(prompt);
-	}
+        if (prompt)
+            free(prompt);
+    }
 	if (prompt)
 		free(prompt);
     quit_shell(EXIT_SUCCESS, NULL, data);

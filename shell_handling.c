@@ -6,7 +6,7 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/31 14:18:51 by ferrefire     #+#    #+#                 */
-/*   Updated: 2024/06/03 22:06:46 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/06 19:55:27 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ int check_commands(t_data *data)
     {
         while (data->command_line[++i] && (in_quotes || data->command_line[i] != ' '))
         {
-            if (data->command_line[i] == '"')
-                in_quotes = 1 - in_quotes;
+            if ((data->command_line[i] == 34 || data->command_line[i] == 39) && (!in_quotes || data->command_line[i] == in_quotes))
+                in_quotes = data->command_line[i] - in_quotes;
             else
             {
                 if (!in_quotes && in_str(data->command_line + i, METACHARS, 1) == 1)
@@ -48,8 +48,13 @@ int check_commands(t_data *data)
         }
         if (ft_strlen(new_command) > 0)
         {
-            if (ft_strlen(new_command) > 2 && new_command [0] == '$' && new_command[1] == '$' && getenv(new_command + 2))
-                commands = add_to_args(getenv(new_command + 2), commands);
+            if (ft_strlen(new_command) > 2 && new_command [0] == '$' && new_command[1] == '$')
+            {
+                if (get_env(new_command + 2, 1, data))
+                    commands = add_to_args(get_env(new_command + 2, 1, data), commands);
+                else
+                    commands = add_to_args(new_command + 1, commands);
+            }
             else
                 commands = add_to_args(new_command, commands);
             new_command[0] = '\0';
@@ -121,11 +126,3 @@ int quit_shell(int exit_code, char *error, t_data *data)
 //    }
 //    return (1);
 //}
-
-int export(t_data *data)
-{
-    if (!data->commands[1])
-        return (print_env(data));
-    data->envp = add_to_args(data->commands[1], data->envp);
-    return (1);
-}

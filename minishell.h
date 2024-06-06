@@ -6,7 +6,7 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 14:28:11 by ferre         #+#    #+#                 */
-/*   Updated: 2024/06/03 22:04:35 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/06 19:51:24 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,16 @@ int print_dir(char *path);
 char *search_dir(char *file_name, char *dir_path);
 char *find_file(char *file_name);
 int get_exec(t_data *data);
-//int clean_shell(t_data *data);
 int quit_shell(int exit_code, char *error, t_data *data);
 int edit_commands(t_data *data, int mode);
 char **add_to_args(char *add, char **args);
 int check_commands(t_data *data);
 int export(t_data *data);
 int print_env(t_data *data);
+int char_index(char *str, char c);
+char *get_env(char *key, int val, t_data *data);
+int cmp_str(const char *s1, const char *s2, int len);
+char **rem_from_args(char *add, char **args);
+int unset(t_data *data);
 
 #endif

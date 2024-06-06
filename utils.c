@@ -6,7 +6,7 @@
 /*   By: ferrefire <ferrefire@student.42.fr>          +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2024/05/26 16:36:46 by ferre         #+#    #+#                 */
-/*   Updated: 2024/06/03 21:16:26 by ferrefire     ########   odam.nl         */
+/*   Updated: 2024/06/06 19:48:19 by ferrefire     ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,4 +129,63 @@ char    **add_to_args(char *add, char **args)
         clean_args(args);
     //free(add);
     return (new_args);
+}
+
+char **rem_from_args(char *add, char **args)
+{
+    char **new_args;
+    int new_count;
+    int i;
+    int j;
+
+    new_count = args_count(args, 0);
+    new_args = malloc(sizeof(void *) * (new_count + 1));
+    i = -1;
+    j = 0;
+    while ((++i + j) < (new_count - 1))
+    {
+        if (cmp_str(add, args[i], -1))
+            j = -1;
+        else
+            new_args[i + j] = ft_strdup(args[i]);
+    }
+    new_args[i + j] = NULL;
+    if (args)
+        clean_args(args);
+    // free(add);
+    return (new_args);
+}
+
+int char_index(char *str, char c)
+{
+    int i;
+
+    i = 0;
+    while (str && str[i])
+    {
+        if (str[i] == c)
+            return (i);
+        i++;
+    }
+    return (-1);
+}
+
+int cmp_str(const char *s1, const char *s2, int len)
+{
+    int i;
+
+    if (!s1 || !s2)
+        return (0);
+    i = 0;
+    while (s1[i] && s2[i] && (i < len || len == -1))
+    {
+        if (s1[i] != s2[i])
+            return (0);
+        i++;
+        if (i == len)
+            return (1);
+    }
+    if (len == -1 && (!s1[i] && !s2[i]))
+        return (1);
+    return (0);
 }
