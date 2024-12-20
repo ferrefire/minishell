@@ -1,23 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   signal_handling.c                                  :+:    :+:            */
+/*   ft_putstr_fd.c                                     :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: ferre <ferre@student.codam.nl>               +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2024/05/26 16:03:29 by ferre         #+#    #+#                 */
-/*   Updated: 2024/05/26 20:24:07 by ferre         ########   odam.nl         */
+/*   Created: 2022/10/16 16:32:18 by fmolenbe      #+#    #+#                 */
+/*   Updated: 2024/05/26 17:25:22 by ferre         ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <unistd.h>
 
-void interrupt_shell(int signal)
+void	ft_putstr_fd(char *s, int fd)
 {
-	if (signal != SIGINT)
-		return;
-	printf("\n");
-	rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
+	int	i;
+
+	i = -1;
+	while (s[++i])
+		write(fd, &s[i], 1);
 }

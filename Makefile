@@ -1,17 +1,25 @@
 CC=cc
 CFLAGS=-Wall -Wextra -Werror
+#CFLAGS=
+IFLAGS=-I includes -I libft
 LFLAGS=-Llibft -lft -lreadline
-SRC=main.c signal_handling.c command_handling.c utils.c redirecting.c directory_handling.c shell_handling.c environment_handling.c
-OBJ=$(SRC:%.c=%.o)
+OBJDIR=objects/
+SRCDIR=sources/
+SRC=$(wildcard $(SRCDIR)*.c)
+OBJ=$(patsubst $(SRCDIR)%,$(OBJDIR)%,$(SRC:.c=.o))
+ICL=$(wildcard includes/*.h)
 NAME=minishell
 
-$(NAME): $(SRC) minishell.h
-	$(CC) $(CFLAGS) -c $(SRC)
+$(NAME): $(OBJ) $(ICL)
 	cd libft && make
 	$(CC) -o $(NAME) $(OBJ) $(LFLAGS)
 
+$(OBJDIR)%.o: $(SRCDIR)%.c $(ICL)
+	mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) $(IFLAGS) -c $< -o $@
+
 clean:
-	rm -f $(OBJ)
+	rm -rf $(OBJDIR)
 	cd libft && make clean
 
 fclean: clean
